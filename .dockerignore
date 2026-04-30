@@ -1,0 +1,11 @@
+.git
+.gitignore
+README.md
+docker-compose.yml
+task-manager-frontend/node_modules
+task-manager-frontend/dist
+task-manager-backend/node_modules
+task-manager-backend/data
+task-manager-backend/.env
+task-manager-backend/.env.local
+*.log

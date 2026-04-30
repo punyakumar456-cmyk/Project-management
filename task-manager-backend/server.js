@@ -2,6 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import connectDB from './config/database.js';
 import errorHandler from './middleware/errorHandler.js';
 
@@ -15,6 +17,9 @@ dotenv.config();
 
 // Initialize Express app
 const app = express();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const frontendDistPath = path.join(__dirname, 'public');
 
 // Connect to SQLite
 connectDB();
@@ -34,6 +39,18 @@ app.use('/api/tasks', taskRoutes);
 app.get('/api/health', (req, res) => {
   res.status(200).json({ success: true, message: 'Server is running' });
 });
+
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(frontendDistPath));
+
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api')) {
+      return next();
+    }
+
+    return res.sendFile(path.join(frontendDistPath, 'index.html'));
+  });
+}
 
 // 404 handler
 app.use((req, res) => {
